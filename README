@@ -1,0 +1,54 @@
+pilfs
+=====
+протестировано на дистрибутиве pilfs
+https://gitlab.com/gusco/pilfs-images/raw/master/pilfs-base-rpi3-20200915.img.xz
+
+
+Общая инфа
+==========
+https://eax.me/hd44780-protocol/
+https://www.codeproject.com/Articles/1032794/Simple-I-O-device-driver-for-RaspberryPi
+http://www.pieter-jan.com/node/15
+https://sysprogs.com/VisualKernel/tutorials/raspberry/leddriver/
+ 
+ 
+моя схема подключения дисплея:
+==============================
+LCD          Raspberry Pi 3 physical GPIO pins  
+1 GND  <---> 6
+2 VCC  <---> 2
+4 RS   <---> 7  GPIO4
+6 E    <---> 11 GPIO17
+11 DB4 <---> 12 GPIO18
+12 DB5 <---> 13 GPIO27
+13 DB6 <---> 15 GPIO22
+14 DB7 <---> 16 GPIO23
+
+
+качаем исходник ядра 5.4.65
+===========================
+cd /usr/src
+#wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.4.65.tar.xz
+wget https://github.com/raspberrypi/linux/archive/rpi-5.4.y.tar.gz
+tar -xf rpi-5.10.y.tar.gz
+кладем его в папку ../linux-rpi-5.4.y
+cd linux-rpi-5.4.y
+make mrproper
+make bcmrpi_defconfig
+make bcm2709_defconfig
+wget https://github.com/raspberrypi/firmware/raw/master/extra/Module7.symvers
+make modules_prepare
+depmod
+
+
+теперь компилируем драйвер:
+cd driver
+make
+
+образуется файл lcd1602.ko
+
+подгружаем модуль:
+insmod lcd1602.ko
+
+выводим на дисплей:
+echo "hello" >> /dev/lcd1602
